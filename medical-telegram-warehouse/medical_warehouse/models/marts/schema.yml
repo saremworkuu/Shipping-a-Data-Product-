@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  - name: dim_channels
+    description: "Dimension table containing channel-level attributes and metrics"
+    columns:
+      - name: channel_key
+        description: "Surrogate key for the channel"
+        tests:
+          - unique
+          - not_null
+      - name: channel_name
+        description: "Name of the Telegram channel"
+        tests:
+          - unique
+          - not_null
+      - name: channel_type
+        description: "Type of channel (Medical, Cosmetics, Pharmaceutical, Other)"
+      - name: first_post_date
+        description: "Date of the first post in the channel"
+      - name: last_post_date
+        description: "Date of the last post in the channel"
+      - name: total_posts
+        description: "Total number of posts in the channel"
+        tests:
+          - not_null
+      - name: total_views
+        description: "Total views across all posts in the channel"
+      - name: avg_views
+        description: "Average views per post in the channel"
+      - name: total_forwards
+        description: "Total forwards across all posts in the channel"
+      - name: total_image_posts
+        description: "Total number of posts with images"
+      - name: image_post_percentage
+        description: "Percentage of posts that contain images"
+
+  - name: dim_dates
+    description: "Dimension table containing date attributes for time-based analysis"
+    columns:
+      - name: date_key
+        description: "Surrogate key for the date (YYYYMMDD format)"
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        description: "Full date value"
+        tests:
+          - unique
+          - not_null
+      - name: day_of_month
+        description: "Day of the month (1-31)"
+      - name: day_of_week
+        description: "Day of the week (1-7, ISO standard)"
+      - name: day_name
+        description: "Name of the day (Monday, Tuesday, etc.)"
+      - name: week_of_year
+        description: "Week number of the year (1-53)"
+      - name: month
+        description: "Month number (1-12)"
+      - name: month_name
+        description: "Name of the month"
+      - name: quarter
+        description: "Quarter of the year (1-4)"
+      - name: year
+        description: "Year"
+      - name: is_weekend
+        description: "Flag indicating if the date is a weekend"
+
+  - name: fct_messages
+    description: "Fact table containing message-level transactional data"
+    columns:
+      - name: channel_key
+        description: "Foreign key to dim_channels"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_channels')
+              field: channel_key
+      - name: date_key
+        description: "Foreign key to dim_dates"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_dates')
+              field: date_key
+      - name: message_id
+        description: "Unique identifier for the message"
+        tests:
+          - unique
+          - not_null
+      - name: message_text
+        description: "Full text content of the message"
+      - name: message_length
+        description: "Length of the message text"
+        tests:
+          - not_null
+      - name: views
+        description: "Number of views on the message"
+        tests:
+          - not_null
+      - name: forwards
+        description: "Number of times the message was forwarded"
+        tests:
+          - not_null
+      - name: has_image
+        description: "Whether the message has an image"
+        tests:
+          - not_null
+      - name: image_path
+        description: "Path to downloaded image if applicable"
+      - name: message_date
+        description: "Timestamp of the message"
